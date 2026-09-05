@@ -11,7 +11,7 @@ public MathSDK API.
 | SymEngine | `v0.14.0` | commit `fac9314c78f2809570494017efc6603befeb4eda` |
 | Boost | `1.80.0` | SHA-256 `e34756f63abe8ac34b35352743f17d061fcc825969a2dd8458264edb38781782` |
 | Android NDK | `28.2.13676358` | same version used by the current Flutter SDK |
-| Android API | `24` | same minimum SDK as `bernify_app` |
+| Android API | `24` | minimum SDK targeted by consuming apps |
 | CMake | `3.22.1` | Android SDK distribution |
 
 SymEngine is configured with `INTEGER_CLASS=boostmp`, static linkage, tests

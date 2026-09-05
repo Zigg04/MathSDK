@@ -1,15 +1,15 @@
 # MathSDK
 
-MathSDK is Bernify's native mathematical engine. SymEngine is the primary
-symbolic core. Capabilities not provided by SymEngine will be implemented as
-C++ modules inside this SDK, without a Python or SymPy runtime fallback.
+MathSDK is a native, embeddable mathematical engine. SymEngine is the primary
+symbolic core. Capabilities not provided by SymEngine are implemented as C++
+modules inside this SDK, without a Python or SymPy runtime fallback.
 
 ## Architecture
 
 ```text
-Flutter / Dart
+Any host application (Dart, Kotlin, Swift, C++, ...)
     |
-    | dart:ffi
+    | FFI / direct linkage
     v
 Public C ABI: native/include/mathsdk/math_sdk.h
     |
@@ -25,8 +25,9 @@ and headers never cross the SDK boundary. Each returned string is owned by the
 caller and released with `math_sdk_free_string`.
 
 The build produces one shared library on Android and desktop. On Apple
-platforms it produces a static library that will be linked into the Flutter
-plugin and opened through `DynamicLibrary.process()`.
+platforms it produces a static library meant to be linked into a host app and
+opened through the platform's own dynamic-library APIs (e.g. Dart's
+`DynamicLibrary.process()`).
 
 ## Current API
 
@@ -53,7 +54,8 @@ already handled by the pinned SymEngine core.
 - Public functions represent product operations such as `evaluate` or `solve`;
   the API does not mirror SymEngine's class hierarchy.
 - The C++ facade owns input validation, exception translation, and output
-  allocation. Mathematical modules do not know about Dart FFI.
+  allocation. Mathematical modules do not know about any particular host
+  runtime or FFI mechanism.
 - Modules remain stateless unless measurements show that a persistent native
   context is necessary.
 - There is no internal plugin registry or generic command dispatcher. A module
@@ -94,24 +96,13 @@ $abi = 'arm64-v8a'
   --target mathsdk_test --parallel
 ```
 
-## Bernify integration
+## Using MathSDK from a host application
 
-The Flutter binding lives in
-`bernify_app/lib/features/math_engine/data/services/math_sdk_service.dart`.
-It loads `libmathsdk.so` on Android, `mathsdk.dll` on Windows, and the current
-process on Apple platforms. Native failures become typed `MathSolverException`
-values and every returned string is released through `math_sdk_free_string`.
-
-The stripped Android artifacts are packaged at:
-
-```text
-bernify_app/android/app/src/main/jniLibs/arm64-v8a/libmathsdk.so
-bernify_app/android/app/src/main/jniLibs/x86_64/libmathsdk.so
-```
-
-The app no longer contains Chaquopy, Python, SymPy, or a math MethodChannel.
-Rebuild and strip the SDK artifacts before replacing these files after a native
-API or implementation change.
+MathSDK exposes nothing beyond the C ABI in `native/include/mathsdk/math_sdk.h`
+— any host capable of calling a C function (Dart FFI, JNI/Kotlin, Swift via a
+bridging header, or direct C++ linkage) can consume it without modification.
+See `docs/CONSUMERS.md` for a worked example (the Flutter/Dart binding) and
+the packaging conventions a new consumer should follow.
 
 ## Verified targets
 
@@ -128,3 +119,11 @@ the current library is about 1.7 MB for `x86_64` and 1.8 MB for `arm64-v8a`.
 
 The cross-platform toolchain findings and dependency setup are in
 `validation/README.md`.
+
+## License
+
+MIT — see `LICENSE`. MathSDK statically links SymEngine (MIT) and Boost
+(Boost Software License 1.0); their notices are reproduced in
+`THIRD_PARTY_NOTICES.md`.
+
+See `CHANGELOG.md` for release history.
