@@ -15,9 +15,15 @@ extension on Pointer<Char> {
   String readDartString() => cast<Utf8>().toDartString();
 }
 
+/// Idiomatic Dart wrapper over the MathSDK native C ABI.
+///
+/// Owns the loaded native library and translates every call into a Dart
+/// value or a [MathSdkException]. Create one instance with [MathSdk.open]
+/// and reuse it; each method allocates and frees its own native memory.
 final class MathSdk {
   MathSdk._(this._bindings);
 
+  /// Loads the native MathSDK library for the current platform.
   factory MathSdk.open() => MathSdk._(MathSdkBindings(_openLibrary()));
 
   final MathSdkBindings _bindings;
@@ -35,8 +41,11 @@ final class MathSdk {
     throw UnsupportedError('MathSDK is not available on this platform.');
   }
 
+  /// The linked native MathSDK's version string.
   String get version => _bindings.math_sdk_version().readDartString();
 
+  /// Parses and canonicalizes an exact expression (arithmetic, fractions,
+  /// powers, roots, constants, symbolic expressions).
   String evaluate(String expression) {
     return _withOneStringResult(
       expression,
@@ -48,6 +57,8 @@ final class MathSdk {
     );
   }
 
+  /// Same arithmetic subset as [evaluate], plus a JSON reduction trace of
+  /// the steps taken to reach the result.
   (String result, String stepsJson) evaluateSteps(String expression) {
     final nativeExpression = expression.toNativeChar();
     final resultOut = calloc<Pointer<Char>>();
@@ -77,6 +88,8 @@ final class MathSdk {
     }
   }
 
+  /// Replaces every occurrence of [variable] in [expression] with [value]
+  /// (numeric or symbolic), then canonicalizes the result.
   String substitute({
     required String expression,
     required String variable,
@@ -109,6 +122,8 @@ final class MathSdk {
     }
   }
 
+  /// Evaluates [expression] to a [double]. No arbitrary precision — this
+  /// build has no MPFR.
   double evaluateNumeric(String expression) {
     final nativeExpression = expression.toNativeChar();
     final resultOut = calloc<Double>();
@@ -130,6 +145,8 @@ final class MathSdk {
     }
   }
 
+  /// Derivative of [expression] with respect to [variable], of the given
+  /// [order].
   String derivative({
     required String expression,
     required String variable,
@@ -160,6 +177,8 @@ final class MathSdk {
     }
   }
 
+  /// Solves a single-variable [equation] for [variable]. Finite root sets
+  /// only.
   String solve({required String equation, required String variable}) {
     final nativeEquation = equation.toNativeChar();
     final nativeVariable = variable.toNativeChar();
@@ -185,6 +204,8 @@ final class MathSdk {
     }
   }
 
+  /// Solves a linear system of [equations] for [variables]. Guarded
+  /// against singular/inconsistent systems.
   String solveLinearSystem({
     required String equations,
     required String variables,
@@ -213,6 +234,9 @@ final class MathSdk {
     }
   }
 
+  /// Limit of [expression] as [variable] approaches [target], computed via
+  /// series expansion. [direction] is `0` for two-sided, negative for
+  /// left-sided, positive for right-sided.
   String limit({
     required String expression,
     required String variable,
@@ -247,6 +271,9 @@ final class MathSdk {
     }
   }
 
+  /// Indefinite integral of [expression] with respect to [variable], or
+  /// the definite integral when both [lowerBound] and [upperBound] are
+  /// given. Verified by differentiating the result back.
   String integral({
     required String expression,
     required String variable,
@@ -283,6 +310,8 @@ final class MathSdk {
     }
   }
 
+  /// Taylor/Laurent expansion of [expression] around [aroundPoint], up to
+  /// the given [order].
   String series({
     required String expression,
     required String variable,
@@ -317,6 +346,9 @@ final class MathSdk {
     }
   }
 
+  /// Runs [operation] (determinant, inverse, transpose, addition,
+  /// multiplication) on dense matrix [matrixA], and [matrixB] when the
+  /// operation needs a second operand.
   String matrixOp({
     required String operation,
     required String matrixA,
@@ -349,6 +381,8 @@ final class MathSdk {
     }
   }
 
+  /// Closed-form solution of the separable first-order ODE
+  /// `dy/dx = fOfX(xVariable) * gOfY(yVariable)`.
   String odeSolveSeparable({
     required String fOfX,
     required String gOfY,
