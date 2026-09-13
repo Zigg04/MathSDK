@@ -2,7 +2,7 @@ name: mathsdk
 description: >-
   Native symbolic math engine (SymEngine-backed) for Flutter via dart:ffi —
   evaluation, calculus, equation solving, and matrix operations.
-version: 0.1.0
+version: 0.1.1
 homepage: https://github.com/Zigg04/MathSDK
 repository: https://github.com/Zigg04/MathSDK
 

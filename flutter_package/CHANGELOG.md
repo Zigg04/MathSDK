@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.1
+
+Added dartdoc comments to the public API and shortened the package
+description. No functional changes.
+
 ## 0.1.0
 
 Initial release. Wraps MathSDK's native C ABI (native/include/mathsdk/math_sdk.h)
