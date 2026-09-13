@@ -1,0 +1,30 @@
+name: mathsdk
+description: >-
+  A native symbolic math engine (SymEngine-backed) exposed to Flutter via
+  dart:ffi — exact evaluation, substitution, derivatives, equation solving,
+  limits, integrals, series, matrices, and separable ODEs.
+version: 0.1.0
+homepage: https://github.com/Zigg04/MathSDK
+repository: https://github.com/Zigg04/MathSDK
+
+environment:
+  sdk: ^3.11.4
+  flutter: ">=3.22.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  ffi: ^2.2.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  ffigen: ^17.0.0
+  flutter_lints: ^6.0.0
+  test: ^1.25.0
+
+flutter:
+  plugin:
+    platforms:
+      android:
+        ffiPlugin: true

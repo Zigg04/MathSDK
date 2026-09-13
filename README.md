@@ -31,13 +31,28 @@ opened through the platform's own dynamic-library APIs (e.g. Dart's
 
 ## Current API
 
-- `math_sdk_version`
-- `math_sdk_evaluate`
-- `math_sdk_free_string`
+| Function | What it does |
+| --- | --- |
+| `math_sdk_version` | Returns the SDK's version string. |
+| `math_sdk_evaluate` | Parses and canonicalizes an exact expression (arithmetic, fractions, powers, roots, constants, symbolic expressions). |
+| `math_sdk_evaluate_steps` | Same arithmetic subset as `math_sdk_evaluate`, plus a JSON reduction trace of the steps taken. |
+| `math_sdk_substitute` | Substitutes a symbol with a value (numeric or symbolic), then canonicalizes. |
+| `math_sdk_evaluate_numeric` | Evaluates to a `double` (no arbitrary precision — this build has no MPFR). |
+| `math_sdk_derivative` | Derivative with respect to a symbol, any order. |
+| `math_sdk_solve` | Single-variable equation solving; finite root sets only. |
+| `math_sdk_solve_linear_system` | Linear systems, guarded against the singular/inconsistent case before solving. |
+| `math_sdk_limit` | Limit of an expression at a point, one- or two-sided, via series expansion. |
+| `math_sdk_integral` | Indefinite or definite integral over a fixed rule table (power rule, exp/log, trig, linearity, linear-argument substitution), verified by differentiating the result back. |
+| `math_sdk_series` | Taylor/Laurent expansion of an expression around a point. |
+| `math_sdk_matrix_op` | Determinant, inverse, transpose, addition, multiplication on dense matrices. |
+| `math_sdk_ode_solve_separable` | Closed-form solution of a separable first-order ODE. |
+| `math_sdk_free_string` | Releases a string returned by any of the above. |
 
-`math_sdk_evaluate` parses and canonicalizes exact expressions. It supports
-the arithmetic, fractions, powers, roots, constants, and symbolic expressions
-already handled by the pinned SymEngine core.
+Every function's exact coverage, ceiling, and error behavior is documented as
+a comment directly above its declaration in
+`native/include/mathsdk/math_sdk.h` — read that comment before assuming a
+function covers your case. `CHANGELOG.md` records what each release added and
+what it deliberately left out.
 
 ## Design constraints
 
@@ -96,26 +111,35 @@ $abi = 'arm64-v8a'
   --target mathsdk_test --parallel
 ```
 
-## Using MathSDK from a host application
+## Language bindings
 
 MathSDK exposes nothing beyond the C ABI in `native/include/mathsdk/math_sdk.h`
-— any host capable of calling a C function (Dart FFI, JNI/Kotlin, Swift via a
-bridging header, or direct C++ linkage) can consume it without modification.
-See `docs/CONSUMERS.md` for a worked example (the Flutter/Dart binding) and
-the packaging conventions a new consumer should follow.
+— any host capable of calling a C function can consume it without
+modification. This repository maintains one official binding:
+
+- **Flutter/Dart** — [`flutter_package/`](flutter_package/), a federated
+  Flutter plugin (`ffiPlugin: true`). Android compiles the native library
+  from source via Gradle's `externalNativeBuild` + CMake; no prebuilt binary
+  is bundled with the package. See its own README for usage and the current
+  platform support matrix.
+
+To write a binding for another language or framework (JNI/Kotlin, Swift via a
+bridging header, direct C++ linkage, ...), see
+[`docs/CONSUMERS.md`](docs/CONSUMERS.md) for the conventions any consumer
+should follow — ownership rules, status-code translation, and what not to
+depend on.
 
 ## Verified targets
 
-| Target | Integrated SDK | Native execution |
+| Target | Native library | Consumed end-to-end |
 | --- | --- | --- |
-| Windows x64 | Pass | Pass |
-| Android `x86_64` | Pass | APK packaging pass; device run pending |
-| Android `arm64-v8a` | Pass | APK packaging pass; device run pending |
+| Windows x64 | Pass | Pass (native test suite) |
+| Android `arm64-v8a` | Pass | Pass (via `flutter_package`, packaged into a running app) |
+| Android `x86_64` | Pass | Pass (via `flutter_package`, packaged into a running app) |
 | iOS device/simulator | Pending macOS/Xcode | Pending |
 
-The Android libraries export only the three `math_sdk_*` functions and depend
-only on `libm.so`, `libdl.so`, and `libc.so`. After stripping debug symbols,
-the current library is about 1.7 MB for `x86_64` and 1.8 MB for `arm64-v8a`.
+The Android library exports only the `math_sdk_*` functions declared in the
+public header and depends only on `libm.so`, `libdl.so`, and `libc.so`.
 
 The cross-platform toolchain findings and dependency setup are in
 `validation/README.md`.

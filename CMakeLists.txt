@@ -35,6 +35,7 @@ set(BUILD_TESTS OFF CACHE BOOL "Disable upstream tests in MathSDK builds" FORCE)
 set(BUILD_BENCHMARKS OFF CACHE BOOL "Disable SymEngine benchmarks" FORCE)
 set(WITH_COTIRE OFF CACHE BOOL "Disable deprecated cotire support" FORCE)
 set(WITH_SYMENGINE_THREAD_SAFE ON CACHE BOOL "Enable thread-safe SymEngine RCP" FORCE)
+set(WITH_SYMENGINE_RCP ON CACHE BOOL "Use SymEngine's own RCP, never Teuchos" FORCE)
 set(Boost_NO_SYSTEM_PATHS ON CACHE BOOL "Use the pinned Boost headers" FORCE)
 set(Boost_INCLUDE_DIR "${MATHSDK_BOOST_ROOT}" CACHE PATH "Boost include path" FORCE)
 set(BOOST_ROOT "${MATHSDK_BOOST_ROOT}" CACHE PATH "Boost root" FORCE)
@@ -51,7 +52,11 @@ else()
   add_library(mathsdk SHARED)
 endif()
 
-target_sources(mathsdk PRIVATE native/src/math_sdk.cpp)
+target_sources(mathsdk PRIVATE
+  native/src/math_sdk.cpp
+  native/src/arithmetic_steps.cpp
+  native/src/symbolic_integral.cpp
+)
 target_compile_features(mathsdk PRIVATE cxx_std_17)
 target_compile_definitions(mathsdk PRIVATE
   MATHSDK_BUILD
@@ -67,6 +72,10 @@ target_include_directories(mathsdk
     "${MATHSDK_BOOST_ROOT}"
 )
 target_link_libraries(mathsdk PRIVATE symengine)
+add_dependencies(mathsdk symengine)
+if(TARGET teuchos)
+  add_dependencies(mathsdk teuchos)
+endif()
 if(UNIX AND NOT APPLE)
   target_link_options(mathsdk PRIVATE "LINKER:--exclude-libs,ALL")
 endif()

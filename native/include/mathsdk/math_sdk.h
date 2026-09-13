@@ -32,10 +32,101 @@ typedef enum MathSdkStatus {
 
 MATHSDK_API const char *math_sdk_version(void) MATHSDK_NOEXCEPT;
 
-/* Both output pointers are required. Release returned strings with
- * math_sdk_free_string. */
 MATHSDK_API MathSdkStatus math_sdk_evaluate(
     const char *expression,
+    char **out_result,
+    char **out_error
+) MATHSDK_NOEXCEPT;
+
+
+MATHSDK_API MathSdkStatus math_sdk_evaluate_steps(
+    const char *expression,
+    char **out_result,
+    char **out_steps,
+    char **out_error
+) MATHSDK_NOEXCEPT;
+
+
+MATHSDK_API MathSdkStatus math_sdk_substitute(
+    const char *expression,
+    const char *variable,
+    const char *value,
+    char **out_result,
+    char **out_error
+) MATHSDK_NOEXCEPT;
+
+MATHSDK_API MathSdkStatus math_sdk_evaluate_numeric(
+    const char *expression,
+    double *out_result,
+    char **out_error
+) MATHSDK_NOEXCEPT;
+
+MATHSDK_API MathSdkStatus math_sdk_derivative(
+    const char *expression,
+    const char *variable,
+    int order,
+    char **out_result,
+    char **out_error
+) MATHSDK_NOEXCEPT;
+
+MATHSDK_API MathSdkStatus math_sdk_solve(
+    const char *equation,
+    const char *variable,
+    char **out_result,
+    char **out_error
+) MATHSDK_NOEXCEPT;
+
+MATHSDK_API MathSdkStatus math_sdk_solve_linear_system(
+    const char *equations,
+    const char *variables,
+    char **out_result,
+    char **out_error
+) MATHSDK_NOEXCEPT;
+
+MATHSDK_API MathSdkStatus math_sdk_limit(
+    const char *expression,
+    const char *variable,
+    const char *target,
+    int direction,
+    char **out_result,
+    char **out_error
+) MATHSDK_NOEXCEPT;
+
+
+MATHSDK_API MathSdkStatus math_sdk_integral(
+    const char *expression,
+    const char *variable,
+    const char *lower_bound,
+    const char *upper_bound,
+    char **out_result,
+    char **out_error
+) MATHSDK_NOEXCEPT;
+
+
+MATHSDK_API MathSdkStatus math_sdk_series(
+    const char *expression,
+    const char *variable,
+    const char *around_point,
+    int order,
+    char **out_result,
+    char **out_error
+) MATHSDK_NOEXCEPT;
+
+
+MATHSDK_API MathSdkStatus math_sdk_matrix_op(
+    const char *operation,
+    const char *matrix_a,
+    const char *matrix_b,
+    char **out_result,
+    char **out_error
+) MATHSDK_NOEXCEPT;
+
+
+MATHSDK_API MathSdkStatus math_sdk_ode_solve_separable(
+    const char *f_of_x,
+    const char *g_of_y,
+    const char *x_variable,
+    const char *y_variable,
     char **out_result,
     char **out_error
 ) MATHSDK_NOEXCEPT;

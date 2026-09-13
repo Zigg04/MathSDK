@@ -1,0 +1,18 @@
+name: MathSdkBindings
+description: >-
+  Raw FFI bindings generated from MathSDK's public C ABI. Do not edit —
+  regenerate with `dart run ffigen` whenever native/include/mathsdk/math_sdk.h
+  changes.
+output: 'lib/src/bindings_generated.dart'
+# Only needed to *regenerate* bindings_generated.dart (a dev-time step) —
+# adjust to your machine's Android NDK install. Consumers of the published
+# package never run ffigen; the generated file is checked in.
+llvm-path:
+  - 'C:/Users/Luisg/AppData/Local/Android/Sdk/ndk/29.0.13113456/toolchains/llvm/prebuilt/windows-x86_64'
+headers:
+  entry-points:
+    - '../native/include/mathsdk/math_sdk.h'
+comments:
+  style: any
+  length: full
+silence-enum-warning: true

@@ -1,0 +1,54 @@
+# MathSDK
+
+> Native, embeddable symbolic + numeric math engine exposed as a stable,
+> exception-free C ABI. SymEngine is the private symbolic core; capabilities
+> SymEngine doesn't provide are implemented as private C++ modules and exposed
+> only when a real operation needs them. No Python/SymPy runtime, on any
+> platform.
+
+Only `native/include/mathsdk/math_sdk.h` is public. Every function returns a
+`MathSdkStatus` and writes results through output pointers; strings are
+caller-owned and released with `math_sdk_free_string`. Read the doc comment
+above each declaration in that header before assuming a function covers your
+case — it states the function's exact coverage and ceiling.
+
+## Status codes
+
+`MATHSDK_STATUS_OK`, `_INVALID_ARGUMENT`, `_PARSE_ERROR`, `_DIVISION_BY_ZERO`,
+`_DOMAIN_ERROR`, `_NOT_IMPLEMENTED`, `_INTERNAL_ERROR`. Never repurposed across
+releases — see CHANGELOG.md.
+
+## API surface (14 functions)
+
+- `math_sdk_version` — SDK version string.
+- `math_sdk_evaluate` — parse + canonicalize an exact expression (arithmetic, fractions, powers, roots, constants, symbolic expressions).
+- `math_sdk_evaluate_steps` — same as `evaluate`, plus a JSON step-by-step reduction trace.
+- `math_sdk_substitute` — replace a symbol with a value (numeric or symbolic), then canonicalize.
+- `math_sdk_evaluate_numeric` — evaluate to a `double` (no arbitrary precision).
+- `math_sdk_derivative` — derivative with respect to a symbol, any order.
+- `math_sdk_solve` — single-variable equation solving, finite root sets only.
+- `math_sdk_solve_linear_system` — linear systems; guarded against singular/inconsistent systems.
+- `math_sdk_limit` — limit at a point, one- or two-sided, via series expansion.
+- `math_sdk_integral` — indefinite/definite integral over a rule table, verified by differentiating the result back.
+- `math_sdk_series` — Taylor/Laurent expansion around a point.
+- `math_sdk_matrix_op` — determinant, inverse, transpose, addition, multiplication on dense matrices.
+- `math_sdk_ode_solve_separable` — closed-form solution of a separable first-order ODE.
+- `math_sdk_free_string` — releases any string this API returned.
+
+## Language bindings
+
+- Flutter/Dart: `flutter_package/` — federated `ffiPlugin: true` package, builds native code from source via CMake, no prebuilt binary bundled.
+- Any other language/framework: implement against the C ABI directly; see `docs/CONSUMERS.md` for the ownership/status-code/portability rules a binding must follow.
+
+## Docs
+
+- [README.md](README.md) — architecture, design constraints, evolution rules, build instructions, verified targets.
+- [CHANGELOG.md](CHANGELOG.md) — what each release added, fixed, and deliberately left out.
+- [docs/CONSUMERS.md](docs/CONSUMERS.md) — how to write a new language binding.
+- [native/include/mathsdk/math_sdk.h](native/include/mathsdk/math_sdk.h) — the actual public contract; authoritative over this file.
+- [validation/README.md](validation/README.md) — pinned dependency versions and cross-platform toolchain setup.
+
+## License
+
+MIT. Statically links SymEngine (MIT) and Boost (BSL-1.0); see
+`THIRD_PARTY_NOTICES.md`.
