@@ -20,13 +20,28 @@ extern "C" {
 #define MATHSDK_NOEXCEPT
 #endif
 
+/**
+ * Result code returned by every MathSDK entry point.
+ *
+ * `MATHSDK_STATUS_OK` means the call wrote `out_result`. Every other value
+ * means it wrote `out_error` instead and left `out_result` untouched.
+ * `MATHSDK_STATUS_NOT_IMPLEMENTED` means the input is outside this version's
+ * supported rule set, not that the call failed.
+ */
 typedef enum MathSdkStatus {
+    /** The call succeeded and wrote `out_result`. */
     MATHSDK_STATUS_OK = 0,
+    /** A required argument was null, empty, or malformed. */
     MATHSDK_STATUS_INVALID_ARGUMENT = 1,
+    /** The expression could not be parsed. */
     MATHSDK_STATUS_PARSE_ERROR = 2,
+    /** The computation required a division by zero. */
     MATHSDK_STATUS_DIVISION_BY_ZERO = 3,
+    /** The input is outside the mathematical domain of the operation. */
     MATHSDK_STATUS_DOMAIN_ERROR = 4,
+    /** The input is outside this version's supported rule set. */
     MATHSDK_STATUS_NOT_IMPLEMENTED = 5,
+    /** An unexpected internal failure. Report this as a bug. */
     MATHSDK_STATUS_INTERNAL_ERROR = 100
 } MathSdkStatus;
 

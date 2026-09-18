@@ -1,0 +1,104 @@
+name: Release Android prebuilts
+
+# Builds libmathsdk.so for each supported Android ABI and attaches it to the
+# release. The published pub.dev package contains no native sources, so these
+# artifacts are what `flutter build` downloads at CMake configure time.
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag to attach the artifacts to (e.g. v0.1.1)'
+        required: true
+
+permissions:
+  contents: write
+
+env:
+  SYMENGINE_TAG: v0.14.0
+  BOOST_VERSION: 1.80.0
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        abi: [arm64-v8a, armeabi-v7a, x86_64]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch pinned SymEngine
+        run: |
+          git clone --depth 1 --branch "$SYMENGINE_TAG" \
+            https://github.com/symengine/symengine.git .deps/symengine
+
+      - name: Fetch pinned Boost headers
+        run: |
+          boost_underscored="${BOOST_VERSION//./_}"
+          curl -fsSL -o boost.tar.gz \
+            "https://archives.boost.io/release/${BOOST_VERSION}/source/boost_${boost_underscored}.tar.gz"
+          mkdir -p .deps
+          tar -xzf boost.tar.gz -C .deps
+          test -f ".deps/boost_${boost_underscored}/boost/multiprecision/cpp_int.hpp"
+
+      - name: Configure
+        run: |
+          boost_underscored="${BOOST_VERSION//./_}"
+          cmake -B build -G Ninja \
+            -DCMAKE_TOOLCHAIN_FILE="$ANDROID_NDK_ROOT/build/cmake/android.toolchain.cmake" \
+            -DANDROID_ABI=${{ matrix.abi }} \
+            -DANDROID_PLATFORM=android-24 \
+            -DANDROID_STL=c++_static \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DMATHSDK_BUILD_TESTS=OFF \
+            -DMATHSDK_BOOST_ROOT="$PWD/.deps/boost_${boost_underscored}"
+
+      - name: Build
+        run: cmake --build build --target mathsdk
+
+      - name: Strip, verify, and stage the library
+        run: |
+          bin="$ANDROID_NDK_ROOT/toolchains/llvm/prebuilt/linux-x86_64/bin"
+          # CMake's output directory depends on the generator, so locate the
+          # .so rather than assuming a path.
+          so=$(find build -name libmathsdk.so -type f -print -quit)
+          if [ -z "$so" ]; then
+            echo "libmathsdk.so was not produced by the build" >&2
+            find build -name '*.so' >&2 || true
+            exit 1
+          fi
+          out="libmathsdk-android-${{ matrix.abi }}.so"
+          cp "$so" "$out"
+          "$bin/llvm-strip" --strip-unneeded "$out"
+          # The exported C ABI must survive the strip.
+          for sym in math_sdk_version math_sdk_evaluate math_sdk_free_string; do
+            "$bin/llvm-nm" --defined-only --extern-only --dynamic "$out" | grep -q " $sym$" || { echo "missing export: $sym" >&2; exit 1; }
+          done
+          ls -l "$out"
+
+      - name: Record the checksum
+        run: sha256sum "libmathsdk-android-${{ matrix.abi }}.so" > "libmathsdk-android-${{ matrix.abi }}.so.sha256"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: libmathsdk-android-${{ matrix.abi }}
+          path: |
+            libmathsdk-android-${{ matrix.abi }}.so
+            libmathsdk-android-${{ matrix.abi }}.so.sha256
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+      - name: Combine the checksums
+        run: cat libmathsdk-android-*.so.sha256 > SHA256SUMS
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.tag || github.ref_name }}
+          files: |
+            libmathsdk-android-*.so
+            SHA256SUMS

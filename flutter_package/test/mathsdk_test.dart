@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:mathsdk/mathsdk.dart';
 import 'package:test/test.dart';
 
@@ -48,10 +50,7 @@ void main() {
   });
 
   test('derivative', () {
-    expect(
-      sdk.derivative(expression: 'x^3', variable: 'x', order: 2),
-      '6*x',
-    );
+    expect(sdk.derivative(expression: 'x^3', variable: 'x', order: 2), '6*x');
   });
 
   test('solve', () {
@@ -70,10 +69,7 @@ void main() {
   });
 
   test('limit', () {
-    expect(
-      sdk.limit(expression: 'sin(x)/x', variable: 'x', target: '0'),
-      '1',
-    );
+    expect(sdk.limit(expression: 'sin(x)/x', variable: 'x', target: '0'), '1');
   });
 
   test('integral indefinite', () {
@@ -123,5 +119,40 @@ void main() {
       ),
       'log(y) = (1/2)*x**2 + C',
     );
+  });
+
+  test('open returns the same instance within an isolate', () {
+    expect(identical(MathSdk.open(), MathSdk.open()), isTrue);
+  });
+
+  test('async variants run off the calling isolate', () async {
+    expect(await sdk.evaluateAsync('2 + 3 * 4'), '14');
+    expect(
+      await sdk.derivativeAsync(expression: 'x^3', variable: 'x'),
+      '3*x**2',
+    );
+  });
+
+  test('async variants rethrow MathSdkException', () {
+    expect(
+      () => sdk.evaluateAsync('1/0'),
+      throwsA(
+        isA<MathSdkException>().having(
+          (e) => e.status,
+          'status',
+          MathSdkStatus.MATHSDK_STATUS_DIVISION_BY_ZERO,
+        ),
+      ),
+    );
+  });
+
+  test('native version matches pubspec', () {
+    final declared = File('pubspec.yaml')
+        .readAsLinesSync()
+        .firstWhere((line) => line.startsWith('version:'))
+        .split(':')
+        .last
+        .trim();
+    expect(sdk.version, declared);
   });
 }

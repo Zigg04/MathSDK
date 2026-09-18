@@ -17,14 +17,44 @@ class MathSdkExampleApp extends StatelessWidget {
   }
 }
 
-class _ResultsList extends StatelessWidget {
+/// One row of the demo: the call as written, and what it returned.
+typedef _Row = (String label, String value);
+
+class _ResultsList extends StatefulWidget {
   const _ResultsList();
 
   @override
-  Widget build(BuildContext context) {
-    final sdk = MathSdk.open();
+  State<_ResultsList> createState() => _ResultsListState();
+}
 
-    final rows = <(String, String)>[
+class _ResultsListState extends State<_ResultsList> {
+  /// Computed once rather than in `build`, which runs again on every rebuild.
+  /// These particular calls are fast enough to run on the UI isolate — see
+  /// the cost table on `MathSdkAsync` for when they are not.
+  late final List<_Row> _rows;
+
+  /// Set when the native library fails to load or a call fails, so the demo
+  /// shows what went wrong instead of dying on a blank screen.
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    try {
+      _rows = _compute();
+    } on MathSdkException catch (e) {
+      _rows = const [];
+      _error = e.message;
+    } on ArgumentError catch (e) {
+      // DynamicLibrary.open throws this when libmathsdk.so is missing.
+      _rows = const [];
+      _error = 'Could not load the native library: ${e.message}';
+    }
+  }
+
+  static List<_Row> _compute() {
+    final sdk = MathSdk.open();
+    return [
       ('version', sdk.version),
       ('evaluate("2 + 3 * 4")', sdk.evaluate('2 + 3 * 4')),
       (
@@ -49,12 +79,23 @@ class _ResultsList extends StatelessWidget {
         ),
       ),
     ];
+  }
 
-    return ListView(
-      children: [
-        for (final (label, value) in rows)
-          ListTile(title: Text(label), subtitle: Text(value)),
-      ],
+  @override
+  Widget build(BuildContext context) {
+    final error = _error;
+    if (error != null) {
+      return Padding(
+        padding: const EdgeInsets.all(24),
+        child: Center(child: Text(error, textAlign: TextAlign.center)),
+      );
+    }
+    return ListView.builder(
+      itemCount: _rows.length,
+      itemBuilder: (context, index) {
+        final (label, value) = _rows[index];
+        return ListTile(title: Text(label), subtitle: Text(value));
+      },
     );
   }
 }

@@ -1,6 +1,29 @@
 cmake_minimum_required(VERSION 3.22)
 
-project(MathSDK VERSION 0.1.0 LANGUAGES CXX)
+# flutter_package/pubspec.yaml is the single source of truth for the version.
+# It is what pub.dev publishes, what names the release tag the prebuilt
+# Android libraries are attached to, and what math_sdk_version() reports.
+file(
+  STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/flutter_package/pubspec.yaml"
+  MATHSDK_VERSION_LINE
+  REGEX "^version:"
+  LIMIT_COUNT 1
+)
+if(NOT MATHSDK_VERSION_LINE)
+  message(FATAL_ERROR "No `version:` found in flutter_package/pubspec.yaml.")
+endif()
+string(REGEX REPLACE "^version:[ \t]*" "" MATHSDK_VERSION "${MATHSDK_VERSION_LINE}")
+string(STRIP "${MATHSDK_VERSION}" MATHSDK_VERSION)
+
+# project(VERSION) only accepts numeric components, so a pre-release or build
+# suffix (0.2.0-beta.1) is stripped for CMake's own version. The full string
+# is kept for math_sdk_version().
+string(REGEX MATCH "^[0-9]+(\\.[0-9]+)*" MATHSDK_VERSION_NUMERIC "${MATHSDK_VERSION}")
+if(NOT MATHSDK_VERSION_NUMERIC)
+  message(FATAL_ERROR "Unparseable version in flutter_package/pubspec.yaml: ${MATHSDK_VERSION}")
+endif()
+
+project(MathSDK VERSION "${MATHSDK_VERSION_NUMERIC}" LANGUAGES CXX)
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
@@ -60,7 +83,7 @@ target_sources(mathsdk PRIVATE
 target_compile_features(mathsdk PRIVATE cxx_std_17)
 target_compile_definitions(mathsdk PRIVATE
   MATHSDK_BUILD
-  MATHSDK_VERSION="${PROJECT_VERSION}"
+  MATHSDK_VERSION="${MATHSDK_VERSION}"
 )
 target_include_directories(mathsdk
   PUBLIC

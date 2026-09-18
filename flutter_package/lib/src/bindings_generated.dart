@@ -8,17 +8,16 @@ import 'dart:ffi' as ffi;
 class MathSdkBindings {
   /// Holds the symbol lookup function.
   final ffi.Pointer<T> Function<T extends ffi.NativeType>(String symbolName)
-      _lookup;
+  _lookup;
 
   /// The symbols are looked up in [dynamicLibrary].
   MathSdkBindings(ffi.DynamicLibrary dynamicLibrary)
-      : _lookup = dynamicLibrary.lookup;
+    : _lookup = dynamicLibrary.lookup;
 
   /// The symbols are looked up with [lookup].
   MathSdkBindings.fromLookup(
-      ffi.Pointer<T> Function<T extends ffi.NativeType>(String symbolName)
-          lookup)
-      : _lookup = lookup;
+    ffi.Pointer<T> Function<T extends ffi.NativeType>(String symbolName) lookup,
+  ) : _lookup = lookup;
 
   ffi.Pointer<ffi.Char> math_sdk_version() {
     return _math_sdk_version();
@@ -26,31 +25,39 @@ class MathSdkBindings {
 
   late final _math_sdk_versionPtr =
       _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Char> Function()>>(
-          'math_sdk_version');
-  late final _math_sdk_version =
-      _math_sdk_versionPtr.asFunction<ffi.Pointer<ffi.Char> Function()>();
+        'math_sdk_version',
+      );
+  late final _math_sdk_version = _math_sdk_versionPtr
+      .asFunction<ffi.Pointer<ffi.Char> Function()>();
 
   MathSdkStatus math_sdk_evaluate(
     ffi.Pointer<ffi.Char> expression,
     ffi.Pointer<ffi.Pointer<ffi.Char>> out_result,
     ffi.Pointer<ffi.Pointer<ffi.Char>> out_error,
   ) {
-    return MathSdkStatus.fromValue(_math_sdk_evaluate(
-      expression,
-      out_result,
-      out_error,
-    ));
+    return MathSdkStatus.fromValue(
+      _math_sdk_evaluate(expression, out_result, out_error),
+    );
   }
 
-  late final _math_sdk_evaluatePtr = _lookup<
-      ffi.NativeFunction<
+  late final _math_sdk_evaluatePtr =
+      _lookup<
+        ffi.NativeFunction<
           ffi.UnsignedInt Function(
-              ffi.Pointer<ffi.Char>,
-              ffi.Pointer<ffi.Pointer<ffi.Char>>,
-              ffi.Pointer<ffi.Pointer<ffi.Char>>)>>('math_sdk_evaluate');
-  late final _math_sdk_evaluate = _math_sdk_evaluatePtr.asFunction<
-      int Function(ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Pointer<ffi.Char>>,
-          ffi.Pointer<ffi.Pointer<ffi.Char>>)>();
+            ffi.Pointer<ffi.Char>,
+            ffi.Pointer<ffi.Pointer<ffi.Char>>,
+            ffi.Pointer<ffi.Pointer<ffi.Char>>,
+          )
+        >
+      >('math_sdk_evaluate');
+  late final _math_sdk_evaluate = _math_sdk_evaluatePtr
+      .asFunction<
+        int Function(
+          ffi.Pointer<ffi.Char>,
+          ffi.Pointer<ffi.Pointer<ffi.Char>>,
+          ffi.Pointer<ffi.Pointer<ffi.Char>>,
+        )
+      >();
 
   MathSdkStatus math_sdk_evaluate_steps(
     ffi.Pointer<ffi.Char> expression,
@@ -58,27 +65,31 @@ class MathSdkBindings {
     ffi.Pointer<ffi.Pointer<ffi.Char>> out_steps,
     ffi.Pointer<ffi.Pointer<ffi.Char>> out_error,
   ) {
-    return MathSdkStatus.fromValue(_math_sdk_evaluate_steps(
-      expression,
-      out_result,
-      out_steps,
-      out_error,
-    ));
+    return MathSdkStatus.fromValue(
+      _math_sdk_evaluate_steps(expression, out_result, out_steps, out_error),
+    );
   }
 
-  late final _math_sdk_evaluate_stepsPtr = _lookup<
-      ffi.NativeFunction<
+  late final _math_sdk_evaluate_stepsPtr =
+      _lookup<
+        ffi.NativeFunction<
           ffi.UnsignedInt Function(
-              ffi.Pointer<ffi.Char>,
-              ffi.Pointer<ffi.Pointer<ffi.Char>>,
-              ffi.Pointer<ffi.Pointer<ffi.Char>>,
-              ffi.Pointer<ffi.Pointer<ffi.Char>>)>>('math_sdk_evaluate_steps');
-  late final _math_sdk_evaluate_steps = _math_sdk_evaluate_stepsPtr.asFunction<
-      int Function(
+            ffi.Pointer<ffi.Char>,
+            ffi.Pointer<ffi.Pointer<ffi.Char>>,
+            ffi.Pointer<ffi.Pointer<ffi.Char>>,
+            ffi.Pointer<ffi.Pointer<ffi.Char>>,
+          )
+        >
+      >('math_sdk_evaluate_steps');
+  late final _math_sdk_evaluate_steps = _math_sdk_evaluate_stepsPtr
+      .asFunction<
+        int Function(
           ffi.Pointer<ffi.Char>,
           ffi.Pointer<ffi.Pointer<ffi.Char>>,
           ffi.Pointer<ffi.Pointer<ffi.Char>>,
-          ffi.Pointer<ffi.Pointer<ffi.Char>>)>();
+          ffi.Pointer<ffi.Pointer<ffi.Char>>,
+        )
+      >();
 
   MathSdkStatus math_sdk_substitute(
     ffi.Pointer<ffi.Char> expression,
@@ -87,54 +98,62 @@ class MathSdkBindings {
     ffi.Pointer<ffi.Pointer<ffi.Char>> out_result,
     ffi.Pointer<ffi.Pointer<ffi.Char>> out_error,
   ) {
-    return MathSdkStatus.fromValue(_math_sdk_substitute(
-      expression,
-      variable,
-      value,
-      out_result,
-      out_error,
-    ));
+    return MathSdkStatus.fromValue(
+      _math_sdk_substitute(expression, variable, value, out_result, out_error),
+    );
   }
 
-  late final _math_sdk_substitutePtr = _lookup<
-      ffi.NativeFunction<
+  late final _math_sdk_substitutePtr =
+      _lookup<
+        ffi.NativeFunction<
           ffi.UnsignedInt Function(
-              ffi.Pointer<ffi.Char>,
-              ffi.Pointer<ffi.Char>,
-              ffi.Pointer<ffi.Char>,
-              ffi.Pointer<ffi.Pointer<ffi.Char>>,
-              ffi.Pointer<ffi.Pointer<ffi.Char>>)>>('math_sdk_substitute');
-  late final _math_sdk_substitute = _math_sdk_substitutePtr.asFunction<
-      int Function(
+            ffi.Pointer<ffi.Char>,
+            ffi.Pointer<ffi.Char>,
+            ffi.Pointer<ffi.Char>,
+            ffi.Pointer<ffi.Pointer<ffi.Char>>,
+            ffi.Pointer<ffi.Pointer<ffi.Char>>,
+          )
+        >
+      >('math_sdk_substitute');
+  late final _math_sdk_substitute = _math_sdk_substitutePtr
+      .asFunction<
+        int Function(
           ffi.Pointer<ffi.Char>,
           ffi.Pointer<ffi.Char>,
           ffi.Pointer<ffi.Char>,
           ffi.Pointer<ffi.Pointer<ffi.Char>>,
-          ffi.Pointer<ffi.Pointer<ffi.Char>>)>();
+          ffi.Pointer<ffi.Pointer<ffi.Char>>,
+        )
+      >();
 
   MathSdkStatus math_sdk_evaluate_numeric(
     ffi.Pointer<ffi.Char> expression,
     ffi.Pointer<ffi.Double> out_result,
     ffi.Pointer<ffi.Pointer<ffi.Char>> out_error,
   ) {
-    return MathSdkStatus.fromValue(_math_sdk_evaluate_numeric(
-      expression,
-      out_result,
-      out_error,
-    ));
+    return MathSdkStatus.fromValue(
+      _math_sdk_evaluate_numeric(expression, out_result, out_error),
+    );
   }
 
-  late final _math_sdk_evaluate_numericPtr = _lookup<
-          ffi.NativeFunction<
-              ffi.UnsignedInt Function(
-                  ffi.Pointer<ffi.Char>,
-                  ffi.Pointer<ffi.Double>,
-                  ffi.Pointer<ffi.Pointer<ffi.Char>>)>>(
-      'math_sdk_evaluate_numeric');
-  late final _math_sdk_evaluate_numeric =
-      _math_sdk_evaluate_numericPtr.asFunction<
-          int Function(ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Double>,
-              ffi.Pointer<ffi.Pointer<ffi.Char>>)>();
+  late final _math_sdk_evaluate_numericPtr =
+      _lookup<
+        ffi.NativeFunction<
+          ffi.UnsignedInt Function(
+            ffi.Pointer<ffi.Char>,
+            ffi.Pointer<ffi.Double>,
+            ffi.Pointer<ffi.Pointer<ffi.Char>>,
+          )
+        >
+      >('math_sdk_evaluate_numeric');
+  late final _math_sdk_evaluate_numeric = _math_sdk_evaluate_numericPtr
+      .asFunction<
+        int Function(
+          ffi.Pointer<ffi.Char>,
+          ffi.Pointer<ffi.Double>,
+          ffi.Pointer<ffi.Pointer<ffi.Char>>,
+        )
+      >();
 
   MathSdkStatus math_sdk_derivative(
     ffi.Pointer<ffi.Char> expression,
@@ -143,30 +162,33 @@ class MathSdkBindings {
     ffi.Pointer<ffi.Pointer<ffi.Char>> out_result,
     ffi.Pointer<ffi.Pointer<ffi.Char>> out_error,
   ) {
-    return MathSdkStatus.fromValue(_math_sdk_derivative(
-      expression,
-      variable,
-      order,
-      out_result,
-      out_error,
-    ));
+    return MathSdkStatus.fromValue(
+      _math_sdk_derivative(expression, variable, order, out_result, out_error),
+    );
   }
 
-  late final _math_sdk_derivativePtr = _lookup<
-      ffi.NativeFunction<
+  late final _math_sdk_derivativePtr =
+      _lookup<
+        ffi.NativeFunction<
           ffi.UnsignedInt Function(
-              ffi.Pointer<ffi.Char>,
-              ffi.Pointer<ffi.Char>,
-              ffi.Int,
-              ffi.Pointer<ffi.Pointer<ffi.Char>>,
-              ffi.Pointer<ffi.Pointer<ffi.Char>>)>>('math_sdk_derivative');
-  late final _math_sdk_derivative = _math_sdk_derivativePtr.asFunction<
-      int Function(
+            ffi.Pointer<ffi.Char>,
+            ffi.Pointer<ffi.Char>,
+            ffi.Int,
+            ffi.Pointer<ffi.Pointer<ffi.Char>>,
+            ffi.Pointer<ffi.Pointer<ffi.Char>>,
+          )
+        >
+      >('math_sdk_derivative');
+  late final _math_sdk_derivative = _math_sdk_derivativePtr
+      .asFunction<
+        int Function(
           ffi.Pointer<ffi.Char>,
           ffi.Pointer<ffi.Char>,
           int,
           ffi.Pointer<ffi.Pointer<ffi.Char>>,
-          ffi.Pointer<ffi.Pointer<ffi.Char>>)>();
+          ffi.Pointer<ffi.Pointer<ffi.Char>>,
+        )
+      >();
 
   MathSdkStatus math_sdk_solve(
     ffi.Pointer<ffi.Char> equation,
@@ -174,27 +196,31 @@ class MathSdkBindings {
     ffi.Pointer<ffi.Pointer<ffi.Char>> out_result,
     ffi.Pointer<ffi.Pointer<ffi.Char>> out_error,
   ) {
-    return MathSdkStatus.fromValue(_math_sdk_solve(
-      equation,
-      variable,
-      out_result,
-      out_error,
-    ));
+    return MathSdkStatus.fromValue(
+      _math_sdk_solve(equation, variable, out_result, out_error),
+    );
   }
 
-  late final _math_sdk_solvePtr = _lookup<
-      ffi.NativeFunction<
+  late final _math_sdk_solvePtr =
+      _lookup<
+        ffi.NativeFunction<
           ffi.UnsignedInt Function(
-              ffi.Pointer<ffi.Char>,
-              ffi.Pointer<ffi.Char>,
-              ffi.Pointer<ffi.Pointer<ffi.Char>>,
-              ffi.Pointer<ffi.Pointer<ffi.Char>>)>>('math_sdk_solve');
-  late final _math_sdk_solve = _math_sdk_solvePtr.asFunction<
-      int Function(
+            ffi.Pointer<ffi.Char>,
+            ffi.Pointer<ffi.Char>,
+            ffi.Pointer<ffi.Pointer<ffi.Char>>,
+            ffi.Pointer<ffi.Pointer<ffi.Char>>,
+          )
+        >
+      >('math_sdk_solve');
+  late final _math_sdk_solve = _math_sdk_solvePtr
+      .asFunction<
+        int Function(
           ffi.Pointer<ffi.Char>,
           ffi.Pointer<ffi.Char>,
           ffi.Pointer<ffi.Pointer<ffi.Char>>,
-          ffi.Pointer<ffi.Pointer<ffi.Char>>)>();
+          ffi.Pointer<ffi.Pointer<ffi.Char>>,
+        )
+      >();
 
   MathSdkStatus math_sdk_solve_linear_system(
     ffi.Pointer<ffi.Char> equations,
@@ -202,29 +228,36 @@ class MathSdkBindings {
     ffi.Pointer<ffi.Pointer<ffi.Char>> out_result,
     ffi.Pointer<ffi.Pointer<ffi.Char>> out_error,
   ) {
-    return MathSdkStatus.fromValue(_math_sdk_solve_linear_system(
-      equations,
-      variables,
-      out_result,
-      out_error,
-    ));
+    return MathSdkStatus.fromValue(
+      _math_sdk_solve_linear_system(
+        equations,
+        variables,
+        out_result,
+        out_error,
+      ),
+    );
   }
 
-  late final _math_sdk_solve_linear_systemPtr = _lookup<
-          ffi.NativeFunction<
-              ffi.UnsignedInt Function(
-                  ffi.Pointer<ffi.Char>,
-                  ffi.Pointer<ffi.Char>,
-                  ffi.Pointer<ffi.Pointer<ffi.Char>>,
-                  ffi.Pointer<ffi.Pointer<ffi.Char>>)>>(
-      'math_sdk_solve_linear_system');
-  late final _math_sdk_solve_linear_system =
-      _math_sdk_solve_linear_systemPtr.asFunction<
-          int Function(
-              ffi.Pointer<ffi.Char>,
-              ffi.Pointer<ffi.Char>,
-              ffi.Pointer<ffi.Pointer<ffi.Char>>,
-              ffi.Pointer<ffi.Pointer<ffi.Char>>)>();
+  late final _math_sdk_solve_linear_systemPtr =
+      _lookup<
+        ffi.NativeFunction<
+          ffi.UnsignedInt Function(
+            ffi.Pointer<ffi.Char>,
+            ffi.Pointer<ffi.Char>,
+            ffi.Pointer<ffi.Pointer<ffi.Char>>,
+            ffi.Pointer<ffi.Pointer<ffi.Char>>,
+          )
+        >
+      >('math_sdk_solve_linear_system');
+  late final _math_sdk_solve_linear_system = _math_sdk_solve_linear_systemPtr
+      .asFunction<
+        int Function(
+          ffi.Pointer<ffi.Char>,
+          ffi.Pointer<ffi.Char>,
+          ffi.Pointer<ffi.Pointer<ffi.Char>>,
+          ffi.Pointer<ffi.Pointer<ffi.Char>>,
+        )
+      >();
 
   MathSdkStatus math_sdk_limit(
     ffi.Pointer<ffi.Char> expression,
@@ -234,33 +267,42 @@ class MathSdkBindings {
     ffi.Pointer<ffi.Pointer<ffi.Char>> out_result,
     ffi.Pointer<ffi.Pointer<ffi.Char>> out_error,
   ) {
-    return MathSdkStatus.fromValue(_math_sdk_limit(
-      expression,
-      variable,
-      target,
-      direction,
-      out_result,
-      out_error,
-    ));
+    return MathSdkStatus.fromValue(
+      _math_sdk_limit(
+        expression,
+        variable,
+        target,
+        direction,
+        out_result,
+        out_error,
+      ),
+    );
   }
 
-  late final _math_sdk_limitPtr = _lookup<
-      ffi.NativeFunction<
+  late final _math_sdk_limitPtr =
+      _lookup<
+        ffi.NativeFunction<
           ffi.UnsignedInt Function(
-              ffi.Pointer<ffi.Char>,
-              ffi.Pointer<ffi.Char>,
-              ffi.Pointer<ffi.Char>,
-              ffi.Int,
-              ffi.Pointer<ffi.Pointer<ffi.Char>>,
-              ffi.Pointer<ffi.Pointer<ffi.Char>>)>>('math_sdk_limit');
-  late final _math_sdk_limit = _math_sdk_limitPtr.asFunction<
-      int Function(
+            ffi.Pointer<ffi.Char>,
+            ffi.Pointer<ffi.Char>,
+            ffi.Pointer<ffi.Char>,
+            ffi.Int,
+            ffi.Pointer<ffi.Pointer<ffi.Char>>,
+            ffi.Pointer<ffi.Pointer<ffi.Char>>,
+          )
+        >
+      >('math_sdk_limit');
+  late final _math_sdk_limit = _math_sdk_limitPtr
+      .asFunction<
+        int Function(
           ffi.Pointer<ffi.Char>,
           ffi.Pointer<ffi.Char>,
           ffi.Pointer<ffi.Char>,
           int,
           ffi.Pointer<ffi.Pointer<ffi.Char>>,
-          ffi.Pointer<ffi.Pointer<ffi.Char>>)>();
+          ffi.Pointer<ffi.Pointer<ffi.Char>>,
+        )
+      >();
 
   MathSdkStatus math_sdk_integral(
     ffi.Pointer<ffi.Char> expression,
@@ -270,33 +312,42 @@ class MathSdkBindings {
     ffi.Pointer<ffi.Pointer<ffi.Char>> out_result,
     ffi.Pointer<ffi.Pointer<ffi.Char>> out_error,
   ) {
-    return MathSdkStatus.fromValue(_math_sdk_integral(
-      expression,
-      variable,
-      lower_bound,
-      upper_bound,
-      out_result,
-      out_error,
-    ));
+    return MathSdkStatus.fromValue(
+      _math_sdk_integral(
+        expression,
+        variable,
+        lower_bound,
+        upper_bound,
+        out_result,
+        out_error,
+      ),
+    );
   }
 
-  late final _math_sdk_integralPtr = _lookup<
-      ffi.NativeFunction<
+  late final _math_sdk_integralPtr =
+      _lookup<
+        ffi.NativeFunction<
           ffi.UnsignedInt Function(
-              ffi.Pointer<ffi.Char>,
-              ffi.Pointer<ffi.Char>,
-              ffi.Pointer<ffi.Char>,
-              ffi.Pointer<ffi.Char>,
-              ffi.Pointer<ffi.Pointer<ffi.Char>>,
-              ffi.Pointer<ffi.Pointer<ffi.Char>>)>>('math_sdk_integral');
-  late final _math_sdk_integral = _math_sdk_integralPtr.asFunction<
-      int Function(
+            ffi.Pointer<ffi.Char>,
+            ffi.Pointer<ffi.Char>,
+            ffi.Pointer<ffi.Char>,
+            ffi.Pointer<ffi.Char>,
+            ffi.Pointer<ffi.Pointer<ffi.Char>>,
+            ffi.Pointer<ffi.Pointer<ffi.Char>>,
+          )
+        >
+      >('math_sdk_integral');
+  late final _math_sdk_integral = _math_sdk_integralPtr
+      .asFunction<
+        int Function(
           ffi.Pointer<ffi.Char>,
           ffi.Pointer<ffi.Char>,
           ffi.Pointer<ffi.Char>,
           ffi.Pointer<ffi.Char>,
           ffi.Pointer<ffi.Pointer<ffi.Char>>,
-          ffi.Pointer<ffi.Pointer<ffi.Char>>)>();
+          ffi.Pointer<ffi.Pointer<ffi.Char>>,
+        )
+      >();
 
   MathSdkStatus math_sdk_series(
     ffi.Pointer<ffi.Char> expression,
@@ -306,33 +357,42 @@ class MathSdkBindings {
     ffi.Pointer<ffi.Pointer<ffi.Char>> out_result,
     ffi.Pointer<ffi.Pointer<ffi.Char>> out_error,
   ) {
-    return MathSdkStatus.fromValue(_math_sdk_series(
-      expression,
-      variable,
-      around_point,
-      order,
-      out_result,
-      out_error,
-    ));
+    return MathSdkStatus.fromValue(
+      _math_sdk_series(
+        expression,
+        variable,
+        around_point,
+        order,
+        out_result,
+        out_error,
+      ),
+    );
   }
 
-  late final _math_sdk_seriesPtr = _lookup<
-      ffi.NativeFunction<
+  late final _math_sdk_seriesPtr =
+      _lookup<
+        ffi.NativeFunction<
           ffi.UnsignedInt Function(
-              ffi.Pointer<ffi.Char>,
-              ffi.Pointer<ffi.Char>,
-              ffi.Pointer<ffi.Char>,
-              ffi.Int,
-              ffi.Pointer<ffi.Pointer<ffi.Char>>,
-              ffi.Pointer<ffi.Pointer<ffi.Char>>)>>('math_sdk_series');
-  late final _math_sdk_series = _math_sdk_seriesPtr.asFunction<
-      int Function(
+            ffi.Pointer<ffi.Char>,
+            ffi.Pointer<ffi.Char>,
+            ffi.Pointer<ffi.Char>,
+            ffi.Int,
+            ffi.Pointer<ffi.Pointer<ffi.Char>>,
+            ffi.Pointer<ffi.Pointer<ffi.Char>>,
+          )
+        >
+      >('math_sdk_series');
+  late final _math_sdk_series = _math_sdk_seriesPtr
+      .asFunction<
+        int Function(
           ffi.Pointer<ffi.Char>,
           ffi.Pointer<ffi.Char>,
           ffi.Pointer<ffi.Char>,
           int,
           ffi.Pointer<ffi.Pointer<ffi.Char>>,
-          ffi.Pointer<ffi.Pointer<ffi.Char>>)>();
+          ffi.Pointer<ffi.Pointer<ffi.Char>>,
+        )
+      >();
 
   MathSdkStatus math_sdk_matrix_op(
     ffi.Pointer<ffi.Char> operation,
@@ -341,30 +401,33 @@ class MathSdkBindings {
     ffi.Pointer<ffi.Pointer<ffi.Char>> out_result,
     ffi.Pointer<ffi.Pointer<ffi.Char>> out_error,
   ) {
-    return MathSdkStatus.fromValue(_math_sdk_matrix_op(
-      operation,
-      matrix_a,
-      matrix_b,
-      out_result,
-      out_error,
-    ));
+    return MathSdkStatus.fromValue(
+      _math_sdk_matrix_op(operation, matrix_a, matrix_b, out_result, out_error),
+    );
   }
 
-  late final _math_sdk_matrix_opPtr = _lookup<
-      ffi.NativeFunction<
+  late final _math_sdk_matrix_opPtr =
+      _lookup<
+        ffi.NativeFunction<
           ffi.UnsignedInt Function(
-              ffi.Pointer<ffi.Char>,
-              ffi.Pointer<ffi.Char>,
-              ffi.Pointer<ffi.Char>,
-              ffi.Pointer<ffi.Pointer<ffi.Char>>,
-              ffi.Pointer<ffi.Pointer<ffi.Char>>)>>('math_sdk_matrix_op');
-  late final _math_sdk_matrix_op = _math_sdk_matrix_opPtr.asFunction<
-      int Function(
+            ffi.Pointer<ffi.Char>,
+            ffi.Pointer<ffi.Char>,
+            ffi.Pointer<ffi.Char>,
+            ffi.Pointer<ffi.Pointer<ffi.Char>>,
+            ffi.Pointer<ffi.Pointer<ffi.Char>>,
+          )
+        >
+      >('math_sdk_matrix_op');
+  late final _math_sdk_matrix_op = _math_sdk_matrix_opPtr
+      .asFunction<
+        int Function(
           ffi.Pointer<ffi.Char>,
           ffi.Pointer<ffi.Char>,
           ffi.Pointer<ffi.Char>,
           ffi.Pointer<ffi.Pointer<ffi.Char>>,
-          ffi.Pointer<ffi.Pointer<ffi.Char>>)>();
+          ffi.Pointer<ffi.Pointer<ffi.Char>>,
+        )
+      >();
 
   MathSdkStatus math_sdk_ode_solve_separable(
     ffi.Pointer<ffi.Char> f_of_x,
@@ -374,71 +437,94 @@ class MathSdkBindings {
     ffi.Pointer<ffi.Pointer<ffi.Char>> out_result,
     ffi.Pointer<ffi.Pointer<ffi.Char>> out_error,
   ) {
-    return MathSdkStatus.fromValue(_math_sdk_ode_solve_separable(
-      f_of_x,
-      g_of_y,
-      x_variable,
-      y_variable,
-      out_result,
-      out_error,
-    ));
+    return MathSdkStatus.fromValue(
+      _math_sdk_ode_solve_separable(
+        f_of_x,
+        g_of_y,
+        x_variable,
+        y_variable,
+        out_result,
+        out_error,
+      ),
+    );
   }
 
-  late final _math_sdk_ode_solve_separablePtr = _lookup<
-          ffi.NativeFunction<
-              ffi.UnsignedInt Function(
-                  ffi.Pointer<ffi.Char>,
-                  ffi.Pointer<ffi.Char>,
-                  ffi.Pointer<ffi.Char>,
-                  ffi.Pointer<ffi.Char>,
-                  ffi.Pointer<ffi.Pointer<ffi.Char>>,
-                  ffi.Pointer<ffi.Pointer<ffi.Char>>)>>(
-      'math_sdk_ode_solve_separable');
-  late final _math_sdk_ode_solve_separable =
-      _math_sdk_ode_solve_separablePtr.asFunction<
-          int Function(
-              ffi.Pointer<ffi.Char>,
-              ffi.Pointer<ffi.Char>,
-              ffi.Pointer<ffi.Char>,
-              ffi.Pointer<ffi.Char>,
-              ffi.Pointer<ffi.Pointer<ffi.Char>>,
-              ffi.Pointer<ffi.Pointer<ffi.Char>>)>();
+  late final _math_sdk_ode_solve_separablePtr =
+      _lookup<
+        ffi.NativeFunction<
+          ffi.UnsignedInt Function(
+            ffi.Pointer<ffi.Char>,
+            ffi.Pointer<ffi.Char>,
+            ffi.Pointer<ffi.Char>,
+            ffi.Pointer<ffi.Char>,
+            ffi.Pointer<ffi.Pointer<ffi.Char>>,
+            ffi.Pointer<ffi.Pointer<ffi.Char>>,
+          )
+        >
+      >('math_sdk_ode_solve_separable');
+  late final _math_sdk_ode_solve_separable = _math_sdk_ode_solve_separablePtr
+      .asFunction<
+        int Function(
+          ffi.Pointer<ffi.Char>,
+          ffi.Pointer<ffi.Char>,
+          ffi.Pointer<ffi.Char>,
+          ffi.Pointer<ffi.Char>,
+          ffi.Pointer<ffi.Pointer<ffi.Char>>,
+          ffi.Pointer<ffi.Pointer<ffi.Char>>,
+        )
+      >();
 
-  void math_sdk_free_string(
-    ffi.Pointer<ffi.Char> value,
-  ) {
-    return _math_sdk_free_string(
-      value,
-    );
+  void math_sdk_free_string(ffi.Pointer<ffi.Char> value) {
+    return _math_sdk_free_string(value);
   }
 
   late final _math_sdk_free_stringPtr =
       _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Char>)>>(
-          'math_sdk_free_string');
+        'math_sdk_free_string',
+      );
   late final _math_sdk_free_string = _math_sdk_free_stringPtr
       .asFunction<void Function(ffi.Pointer<ffi.Char>)>();
 }
 
+/// Result code returned by every MathSDK entry point.
+///
+/// `MATHSDK_STATUS_OK` means the call wrote `out_result`. Every other value
+/// means it wrote `out_error` instead and left `out_result` untouched.
+/// `MATHSDK_STATUS_NOT_IMPLEMENTED` means the input is outside this version's
+/// supported rule set, not that the call failed.
 enum MathSdkStatus {
+  /// The call succeeded and wrote `out_result`.
   MATHSDK_STATUS_OK(0),
+
+  /// A required argument was null, empty, or malformed.
   MATHSDK_STATUS_INVALID_ARGUMENT(1),
+
+  /// The expression could not be parsed.
   MATHSDK_STATUS_PARSE_ERROR(2),
+
+  /// The computation required a division by zero.
   MATHSDK_STATUS_DIVISION_BY_ZERO(3),
+
+  /// The input is outside the mathematical domain of the operation.
   MATHSDK_STATUS_DOMAIN_ERROR(4),
+
+  /// The input is outside this version's supported rule set.
   MATHSDK_STATUS_NOT_IMPLEMENTED(5),
+
+  /// An unexpected internal failure. Report this as a bug.
   MATHSDK_STATUS_INTERNAL_ERROR(100);
 
   final int value;
   const MathSdkStatus(this.value);
 
   static MathSdkStatus fromValue(int value) => switch (value) {
-        0 => MATHSDK_STATUS_OK,
-        1 => MATHSDK_STATUS_INVALID_ARGUMENT,
-        2 => MATHSDK_STATUS_PARSE_ERROR,
-        3 => MATHSDK_STATUS_DIVISION_BY_ZERO,
-        4 => MATHSDK_STATUS_DOMAIN_ERROR,
-        5 => MATHSDK_STATUS_NOT_IMPLEMENTED,
-        100 => MATHSDK_STATUS_INTERNAL_ERROR,
-        _ => throw ArgumentError("Unknown value for MathSdkStatus: $value"),
-      };
+    0 => MATHSDK_STATUS_OK,
+    1 => MATHSDK_STATUS_INVALID_ARGUMENT,
+    2 => MATHSDK_STATUS_PARSE_ERROR,
+    3 => MATHSDK_STATUS_DIVISION_BY_ZERO,
+    4 => MATHSDK_STATUS_DOMAIN_ERROR,
+    5 => MATHSDK_STATUS_NOT_IMPLEMENTED,
+    100 => MATHSDK_STATUS_INTERNAL_ERROR,
+    _ => throw ArgumentError("Unknown value for MathSdkStatus: $value"),
+  };
 }
